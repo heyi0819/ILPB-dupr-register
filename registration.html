@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>宜蘭市匹克球委員會DUPR報名系統</title>
+  
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif;
+      background-color: #f4f7f6;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    .logo-img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      border-radius: 50%;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .header h1 {
+      font-size: 22px;
+      color: #2c3e50;
+      margin: 0;
+    }
+    .form-group {
+      margin-bottom: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #2c3e50;
+    }
+    input[type="text"], select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+      background-color: #fafafa;
+    }
+    input[type="text"]:focus, select:focus {
+      border-color: #4CAF50;
+      outline: none;
+      background-color: #fff;
+    }
+    .submit-btn {
+      width: 100%;
+      background-color: #00B900;
+      color: white;
+      border: none;
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 185, 0, 0.3);
+      transition: background-color 0.3s;
+    }
+    .submit-btn:active {
+      background-color: #009900;
+    }
+    /* 按鈕禁用狀態 */
+    .submit-btn:disabled {
+      background-color: #a5d6a7;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    /* 載入中遮罩 */
+    #loadingOverlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 1000;
+      text-align: center;
+      padding-top: 50%;
+      font-size: 18px;
+      font-weight: bold;
+      color: #00B900;
+    }
+    /* 成功畫面 */
+    #successMessage {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 18px;
+      color: #00B900;
+      line-height: 1.8;
+    }
+    /* 隱私聲明 */
+    .privacy-note {
+      font-size: 12px;
+      color: #999;
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loadingOverlay">資料傳送中，請稍候...</div>
+
+  <div class="container">
+    <div class="header">
+      <img src="https://via.placeholder.com/150/00B900/FFFFFF?text=Logo" alt="宜蘭市匹委會徽章" class="logo-img" id="committeeLogo">
+      <h1>宜蘭市匹克球委員會<br>DUPR 報名系統</h1>
+    </div>
+
+    <!-- 報名表單 -->
+    <form id="registrationForm">
+      <div class="form-group">
+        <label for="nameInput">參賽者姓名</label>
+        <input type="text" id="nameInput" placeholder="請輸入真實姓名" required>
+      </div>
+
+      <div class="form-group">
+        <label for="duprInput">DUPR ID</label>
+        <input type="text" id="duprInput" placeholder="例如：A1B2C3" required>
+      </div>
+
+      <div class="form-group">
+        <label for="groupSelect">報名組別</label>
+        <select id="groupSelect" required>
+          <option value="" disabled selected>請選擇組別</option>
+          <option value="女雙3.0-">女雙 3.0-</option>
+          <option value="女雙3.0+">女雙 3.0+</option>
+          <option value="男雙3.0-">男雙 3.0-</option>
+          <option value="男雙3.0+">男雙 3.0+</option>
+          <option value="男雙3.7+">男雙 3.7+</option>
+        </select>
+      </div>
+
+      <button type="button" class="submit-btn" id="submitBtn" onclick="submitRegistration()">送出報名</button>
+
+      <p class="privacy-note">
+        本系統將收集您的姓名、DUPR ID 及 LINE 帳號資訊，<br>
+        僅供本次賽事報名核對用途，不作其他用途。
+      </p>
+    </form>
+
+    <!-- 成功畫面（非 LIFF 環境顯示） -->
+    <div id="successMessage">
+      ✅ 報名成功！<br>請回到 LINE 查看確認訊息。
+    </div>
+  </div>
+
+  <script>
+    // 🌟 1. 填入你在 LINE Developers 後台申請到的 LIFF ID
+    const MY_LIFF_ID = "2009559432-txA3hu8f";
+    
+    // 🌟 2. 填入你從 Google Apps Script 部署取得的 Web App 網址
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby7KXyG-OT1WJbS9YlR3l0iloHXBTSBbnkFnyLu9ukNkqvikPBAF-GHOtAy_7AYIjcpjg/exec";
+
+    // DUPR ID 格式驗證（英數字 6~10 碼，依實際格式可調整）
+    const DUPR_REGEX = /^[A-Za-z0-9]{6,10}$/;
+
+    // 姓名格式驗證（只允許中文、英文與空格）
+    const NAME_REGEX = /^[\u4e00-\u9fa5A-Za-z\s]+$/;
+
+    // 網頁載入後初始化 LIFF
+    window.onload = function() {
+      initializeLiff(MY_LIFF_ID);
+    };
+
+    function initializeLiff(myLiffId) {
+      liff.init({
+        liffId: myLiffId
+      }).then(() => {
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        }
+      }).catch((err) => {
+        // ✅ 修正：初始化失敗時顯示錯誤給使用者
+        console.error('LIFF 初始化失敗', err);
+        alert("系統初始化失敗，請關閉後重新開啟。");
+      });
+    }
+
+    async function submitRegistration() {
+      const name  = document.getElementById('nameInput').value.trim();
+      const dupr  = document.getElementById('duprInput').value.trim();
+      const group = document.getElementById('groupSelect').value;
+      const btn   = document.getElementById('submitBtn');
+
+      // 表單驗證
+      if (!name || !dupr || !group) {
+        alert("請確認姓名、DUPR ID 與組別皆已填寫！");
+        return;
+      }
+
+      // ✅ 修正：姓名格式防呆
+      if (!NAME_REGEX.test(name)) {
+        alert("姓名格式不正確，請勿輸入數字或特殊符號。");
+        return;
+      }
+
+      // ✅ 修正：DUPR ID 格式驗證
+      if (!DUPR_REGEX.test(dupr)) {
+        alert("DUPR ID 格式不正確，請確認後重新輸入（英數字 6~10 碼）。");
+        return;
+      }
+
+      // ✅ 修正：顯示遮罩並同時鎖定按鈕，防止重複送出
+      document.getElementById('loadingOverlay').style.display = 'block';
+      btn.disabled = true;
+
+      try {
+        // ✅ 修正：取得 LINE 使用者資訊一起送出
+        const profile = await liff.getProfile();
+
+        const participantData = {
+          name:            name,
+          dupr:            dupr,
+          group:           group,
+          lineUserId:      profile.userId,
+          lineDisplayName: profile.displayName
+        };
+
+        const response = await fetch(GAS_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(participantData)
+        });
+
+        const result = await response.json();
+
+        document.getElementById('loadingOverlay').style.display = 'none';
+
+        if (result.status === "success") {
+          alert("報名成功！期待在球場見到您。");
+
+          // ✅ 修正：依據環境決定後續行為
+          if (liff.isInClient()) {
+            liff.closeWindow();
+          } else {
+            // 非 LIFF 環境：隱藏表單，顯示成功訊息
+            document.getElementById('registrationForm').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+          }
+        } else {
+          alert("系統發生錯誤：" + result.message);
+          btn.disabled = false;
+        }
+
+      } catch (error) {
+        document.getElementById('loadingOverlay').style.display = 'none';
+        console.error("連線錯誤:", error);
+        alert("無法連線到伺服器，請稍後再試。");
+        // ✅ 修正：連線失敗後解鎖按鈕讓使用者可以重試
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
