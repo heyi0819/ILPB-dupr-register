@@ -8,114 +8,30 @@
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
   <style>
-    body {
-      font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif;
-      background-color: #f4f7f6;
-      margin: 0;
-      padding: 0;
-      color: #333;
-    }
-    .container {
-      max-width: 100%;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 25px;
-    }
-    .logo-img {
-      width: 100px;
-      height: 100px;
-      object-fit: contain;
-      border-radius: 50%;
-      margin-bottom: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    .header h1 {
-      font-size: 22px;
-      color: #2c3e50;
-      margin: 0;
-    }
-    .form-group {
-      margin-bottom: 20px;
-      background: #fff;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-    label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 8px;
-      color: #2c3e50;
-    }
-    input[type="text"], select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-      box-sizing: border-box;
-      background-color: #fafafa;
-    }
-    input[type="text"]:focus, select:focus {
-      border-color: #4CAF50;
-      outline: none;
-      background-color: #fff;
-    }
-    .submit-btn {
-      width: 100%;
-      background-color: #00B900;
-      color: white;
-      border: none;
-      padding: 15px;
-      font-size: 18px;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0, 185, 0, 0.3);
-      transition: background-color 0.3s;
-    }
-    .submit-btn:active {
-      background-color: #009900;
-    }
-    /* 按鈕禁用狀態 */
-    .submit-btn:disabled {
-      background-color: #a5d6a7;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-    /* 載入中遮罩 */
-    #loadingOverlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(255, 255, 255, 0.8);
-      z-index: 1000;
-      text-align: center;
-      padding-top: 50%;
-      font-size: 18px;
-      font-weight: bold;
-      color: #00B900;
-    }
-    /* 成功畫面 */
-    #successMessage {
-      display: none;
-      text-align: center;
-      padding: 40px 20px;
-      font-size: 18px;
-      color: #00B900;
-      line-height: 1.8;
-    }
-    /* 隱私聲明 */
-    .privacy-note {
-      font-size: 12px;
-      color: #999;
-      text-align: center;
-      margin-top: 16px;
-      line-height: 1.6;
-    }
+    body { font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; color: #333; }
+    .container { max-width: 100%; padding: 20px; box-sizing: border-box; }
+    .header { text-align: center; margin-bottom: 25px; }
+    .logo-img { width: 100px; height: 100px; object-fit: contain; border-radius: 50%; margin-bottom: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    .header h1 { font-size: 22px; color: #2c3e50; margin: 0; }
+    .form-group { margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    label { display: block; font-weight: bold; margin-bottom: 8px; color: #2c3e50; }
+    input[type="text"], input[type="number"], select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; box-sizing: border-box; background-color: #fafafa; }
+    input[type="text"]:focus, input[type="number"]:focus, select:focus { border-color: #4CAF50; outline: none; background-color: #fff; }
+    
+    /* 紅框錯誤提示樣式 */
+    input.invalid, select.invalid { border-color: #e74c3c; background-color: #fff5f5; }
+    .error-msg { color: #e74c3c; font-size: 13px; margin-top: 5px; display: none; }
+    .error-msg.show { display: block; }
+
+    .radio-group { display: flex; gap: 15px; margin-bottom: 10px; font-size: 16px; }
+    .radio-group label { font-weight: normal; display: flex; align-items: center; gap: 5px; }
+    
+    .submit-btn { width: 100%; background-color: #00B900; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px rgba(0, 185, 0, 0.3); transition: background-color 0.3s; }
+    .submit-btn:active { background-color: #009900; }
+    .submit-btn:disabled { background-color: #a5d6a7; cursor: not-allowed; box-shadow: none; }
+    #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 1000; text-align: center; padding-top: 50%; font-size: 18px; font-weight: bold; color: #00B900; }
+    #successMessage { display: none; text-align: center; padding: 40px 20px; font-size: 18px; color: #00B900; line-height: 1.8; }
+    .privacy-note { font-size: 12px; color: #999; text-align: center; margin-top: 16px; line-height: 1.6; }
   </style>
 </head>
 <body>
@@ -124,20 +40,21 @@
 
   <div class="container">
     <div class="header">
-      <img src="logo.png" alt="宜蘭市匹委會徽章" class="logo-img" id="committeeLogo">
+      <img src="logo.png" alt="宜蘭市匹委會徽章" class="logo-img" id="committeeLogo" onerror="this.style.display='none'">
       <h1>宜蘭市匹克球委員會<br>DUPR 報名系統</h1>
     </div>
 
-    <!-- 報名表單 -->
     <form id="registrationForm">
       <div class="form-group">
         <label for="nameInput">參賽者姓名</label>
-        <input type="text" id="nameInput" placeholder="請輸入真實姓名" required>
+        <input type="text" id="nameInput" placeholder="請輸入真實姓名" maxlength="20" required>
+        <span class="error-msg" id="nameError">姓名格式不正確，請勿輸入數字或特殊符號。</span>
       </div>
 
       <div class="form-group">
         <label for="duprInput">DUPR ID</label>
-        <input type="text" id="duprInput" placeholder="例如：A1B2C3" required>
+        <input type="text" id="duprInput" placeholder="例如：A1B2C3" maxlength="10" required>
+        <span class="error-msg" id="duprError">DUPR ID 格式不正確，請確認後重新輸入。</span>
       </div>
 
       <div class="form-group">
@@ -150,9 +67,21 @@
           <option value="男雙3.0+">男雙 3.0+</option>
           <option value="男雙3.7+">男雙 3.7+</option>
         </select>
+        <span class="error-msg" id="groupError">請選擇報名組別。</span>
       </div>
 
-      <button type="button" class="submit-btn" id="submitBtn" onclick="submitRegistration()">送出報名</button>
+      <div class="form-group" id="bentoSection">
+        <label>代訂便當 (選填)</label>
+        <div class="radio-group">
+          <label><input type="radio" name="bentoType" value="不訂購" checked> 不訂購</label>
+          <label><input type="radio" name="bentoType" value="葷食"> 葷食</label>
+          <label><input type="radio" name="bentoType" value="素食"> 素食</label>
+        </div>
+        <input type="number" id="bentoQty" placeholder="請輸入便當數量 (若不訂購請留白)" min="0" max="20">
+        <span class="error-msg" id="bentoError"></span>
+      </div>
+
+      <button type="button" class="submit-btn" id="submitBtn">送出報名</button>
 
       <p class="privacy-note">
         本系統將收集您的姓名、DUPR ID 及 LINE 帳號資訊，<br>
@@ -160,42 +89,48 @@
       </p>
     </form>
 
-    <!-- 成功畫面（非 LIFF 環境顯示） -->
     <div id="successMessage">
       ✅ 報名成功！<br>請回到 LINE 查看確認訊息。
     </div>
   </div>
 
   <script>
-    // 🌟 1. 填入你在 LINE Developers 後台申請到的 LIFF ID
+    // 🌟 已更新：專屬的 LIFF ID 與 GAS URL
     const MY_LIFF_ID = "2009559432-txA3hu8f";
-    
-    // 🌟 2. 填入你從 Google Apps Script 部署取得的 Web App 網址
     const GAS_URL = "https://script.google.com/macros/s/AKfycby7KXyG-OT1WJbS9YlR3l0iloHXBTSBbnkFnyLu9ukNkqvikPBAF-GHOtAy_7AYIjcpjg/exec";
+    
+    const ENABLE_BENTO = true;
 
-    // DUPR ID 格式驗證（英數字 6~10 碼，依實際格式可調整）
     const DUPR_REGEX = /^[A-Za-z0-9]{6,10}$/;
-
-    // 姓名格式驗證（只允許中文、英文與空格）
     const NAME_REGEX = /^[\u4e00-\u9fa5A-Za-z\s]+$/;
 
-    // 網頁載入後初始化 LIFF
     window.onload = function() {
+      if (!ENABLE_BENTO) {
+        document.getElementById('bentoSection').style.display = 'none';
+      }
+      document.getElementById('submitBtn').addEventListener('click', submitRegistration);
       initializeLiff(MY_LIFF_ID);
     };
 
     function initializeLiff(myLiffId) {
-      liff.init({
-        liffId: myLiffId
-      }).then(() => {
-        if (!liff.isLoggedIn()) {
-          liff.login();
-        }
+      liff.init({ liffId: myLiffId }).then(() => {
+        if (!liff.isLoggedIn()) liff.login();
       }).catch((err) => {
-        // ✅ 修正：初始化失敗時顯示錯誤給使用者
         console.error('LIFF 初始化失敗', err);
         alert("系統初始化失敗，請關閉後重新開啟。");
       });
+    }
+
+    function setFieldError(inputId, errorId, hasError) {
+      const input = document.getElementById(inputId);
+      const errorEl = document.getElementById(errorId);
+      if (hasError) {
+        input.classList.add('invalid');
+        errorEl.classList.add('show');
+      } else {
+        input.classList.remove('invalid');
+        errorEl.classList.remove('show');
+      }
     }
 
     async function submitRegistration() {
@@ -204,60 +139,95 @@
       const group = document.getElementById('groupSelect').value;
       const btn   = document.getElementById('submitBtn');
 
-      // 表單驗證
-      if (!name || !dupr || !group) {
-        alert("請確認姓名、DUPR ID 與組別皆已填寫！");
-        return;
+      let hasError = false;
+
+      if (!name || !NAME_REGEX.test(name)) {
+        setFieldError('nameInput', 'nameError', true);
+        hasError = true;
+      } else {
+        setFieldError('nameInput', 'nameError', false);
       }
 
-      // ✅ 修正：姓名格式防呆
-      if (!NAME_REGEX.test(name)) {
-        alert("姓名格式不正確，請勿輸入數字或特殊符號。");
-        return;
+      if (!dupr || !DUPR_REGEX.test(dupr)) {
+        setFieldError('duprInput', 'duprError', true);
+        hasError = true;
+      } else {
+        setFieldError('duprInput', 'duprError', false);
       }
 
-      // ✅ 修正：DUPR ID 格式驗證
-      if (!DUPR_REGEX.test(dupr)) {
-        alert("DUPR ID 格式不正確，請確認後重新輸入（英數字 6~10 碼）。");
-        return;
+      if (!group) {
+        setFieldError('groupSelect', 'groupError', true);
+        hasError = true;
+      } else {
+        setFieldError('groupSelect', 'groupError', false);
       }
 
-      // ✅ 修正：顯示遮罩並同時鎖定按鈕，防止重複送出
+      if (hasError) return;
+
+      // 處理便當邏輯
+      let finalBentoType = "無";
+      let finalBentoQty = 0;
+
+      if (ENABLE_BENTO) {
+        const selectedType = document.querySelector('input[name="bentoType"]:checked').value;
+        const inputQtyRaw = document.getElementById('bentoQty').value.trim();
+        const inputQty = inputQtyRaw === "" ? 0 : parseInt(inputQtyRaw, 10);
+        const bentoErrorEl = document.getElementById('bentoError');
+
+        // 防呆：有選葷素，但沒填數量（0 也不行，因為選了就代表要訂）
+        if (selectedType !== "不訂購" && inputQty <= 0) {
+          document.getElementById('bentoQty').classList.add('invalid');
+          bentoErrorEl.textContent = "您選擇了訂購便當，請填寫正確的便當數量！";
+          bentoErrorEl.classList.add('show');
+          return;
+        }
+        // 防呆：有填數量，但沒選葷素
+        if (selectedType === "不訂購" && inputQty > 0) {
+          document.getElementById('bentoQty').classList.add('invalid');
+          bentoErrorEl.textContent = "您填寫了便當數量，請選擇「葷食」還是「素食」！";
+          bentoErrorEl.classList.add('show');
+          return;
+        }
+
+        // 沒有錯誤，清除紅框
+        document.getElementById('bentoQty').classList.remove('invalid');
+        bentoErrorEl.classList.remove('show');
+
+        if (selectedType !== "不訂購") {
+          finalBentoType = selectedType;
+          finalBentoQty = inputQty;
+        }
+      }
+
       document.getElementById('loadingOverlay').style.display = 'block';
       btn.disabled = true;
 
       try {
-        // ✅ 修正：取得 LINE 使用者資訊一起送出
         const profile = await liff.getProfile();
 
         const participantData = {
           name:            name,
           dupr:            dupr,
           group:           group,
+          bentoType:       finalBentoType,
+          bentoQty:        finalBentoQty,
           lineUserId:      profile.userId,
           lineDisplayName: profile.displayName
         };
 
         const response = await fetch(GAS_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8"
-          },
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify(participantData)
         });
 
         const result = await response.json();
-
         document.getElementById('loadingOverlay').style.display = 'none';
 
         if (result.status === "success") {
           alert("報名成功！期待在球場見到您。");
-
-          // ✅ 修正：依據環境決定後續行為
-          if (liff.isInClient()) {
-            liff.closeWindow();
-          } else {
-            // 非 LIFF 環境：隱藏表單，顯示成功訊息
+          if (liff.isInClient()) liff.closeWindow();
+          else {
             document.getElementById('registrationForm').style.display = 'none';
             document.getElementById('successMessage').style.display = 'block';
           }
@@ -268,9 +238,7 @@
 
       } catch (error) {
         document.getElementById('loadingOverlay').style.display = 'none';
-        console.error("連線錯誤:", error);
         alert("無法連線到伺服器，請稍後再試。");
-        // ✅ 修正：連線失敗後解鎖按鈕讓使用者可以重試
         btn.disabled = false;
       }
     }
