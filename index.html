@@ -2,256 +2,138 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>宜蘭市匹克球委員會DUPR報名系統</title>
-  
-  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DUPR 賽事報名</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    body { font-family: 'Helvetica Neue', Arial, '微軟正黑體', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; color: #333; }
-    .container { max-width: 100%; padding: 20px; box-sizing: border-box; }
-    .header { text-align: center; margin-bottom: 25px; }
-    .logo-img { width: 100px; height: 100px; object-fit: contain; border-radius: 50%; margin-bottom: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-    .header h1 { font-size: 22px; color: #2c3e50; margin: 0; }
-    .form-group { margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    label { display: block; font-weight: bold; margin-bottom: 8px; color: #2c3e50; }
-    input[type="text"], input[type="number"], select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; box-sizing: border-box; background-color: #fafafa; }
-    input[type="text"]:focus, input[type="number"]:focus, select:focus { border-color: #4CAF50; outline: none; background-color: #fff; }
-    
-    input.invalid, select.invalid { border-color: #e74c3c; background-color: #fff5f5; }
-    .error-msg { color: #e74c3c; font-size: 13px; margin-top: 5px; display: none; }
-    .error-msg.show { display: block; }
-
-    .radio-group { display: flex; gap: 15px; margin-bottom: 10px; font-size: 16px; }
-    .radio-group label { font-weight: normal; display: flex; align-items: center; gap: 5px; }
-    
-    /* 按鈕群組排版 */
-    .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
-    .submit-btn { width: 100%; background-color: #00B900; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px rgba(0, 185, 0, 0.3); transition: background-color 0.3s; }
-    .submit-btn:active { background-color: #009900; }
-    .submit-btn:disabled { background-color: #a5d6a7; cursor: not-allowed; box-shadow: none; }
-    
-    /* 取消按鈕樣式 */
-    .cancel-btn { width: 100%; background-color: #e74c3c; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px rgba(231, 76, 60, 0.3); transition: background-color 0.3s; }
-    .cancel-btn:active { background-color: #c0392b; }
-    .cancel-btn:disabled { background-color: #f1948a; cursor: not-allowed; box-shadow: none; }
-
-    #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 1000; text-align: center; padding-top: 50%; font-size: 18px; font-weight: bold; color: #00B900; }
-    #successMessage { display: none; text-align: center; padding: 40px 20px; font-size: 18px; color: #00B900; line-height: 1.8; }
-    .privacy-note { font-size: 12px; color: #999; text-align: center; margin-top: 16px; line-height: 1.6; }
+    body { font-family: sans-serif; padding: 20px; }
+    .form-group { margin-bottom: 15px; }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+    button { width: 100%; padding: 10px; background-color: #06C755; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
+    #loadingMessage, #closedMessage { text-align: center; margin-top: 50px; font-size: 18px; }
+    #closedMessage { color: red; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <div id="loadingOverlay">資料傳送中，請稍候...</div>
+  <div id="loadingMessage">系統連線中，請稍候...</div>
+  <div id="closedMessage" style="display: none;">⚠️ 目前非賽事報名時段</div>
 
-  <div class="container">
-    <div class="header">
-      <img src="logo.png" alt="宜蘭市匹委會徽章" class="logo-img" id="committeeLogo" onerror="this.style.display='none'">
-      <h1>宜蘭市匹克球委員會<br>DUPR 報名系統</h1>
-    </div>
-
-    <form id="registrationForm">
+  <div id="formContainer" style="display: none;">
+    <h2>🎾 DUPR 賽事報名表</h2>
+    <form id="duprForm">
       <div class="form-group">
-        <label for="nameInput">參賽者姓名</label>
-        <input type="text" id="nameInput" placeholder="請輸入真實姓名" maxlength="20" required>
-        <span class="error-msg" id="nameError">姓名格式不正確，請勿輸入數字或特殊符號。</span>
+        <label>真實姓名：</label>
+        <input type="text" id="realName" required>
       </div>
-
       <div class="form-group">
-        <label for="duprInput">DUPR ID</label>
-        <input type="text" id="duprInput" placeholder="例如：A1B2C3" maxlength="10" required>
-        <span class="error-msg" id="duprError">DUPR ID 格式不正確，請確認後重新輸入。</span>
+        <label>DUPR ID：</label>
+        <input type="text" id="duprId" required>
       </div>
-
       <div class="form-group">
-        <label for="groupSelect">報名組別</label>
-        <select id="groupSelect" required>
-          <option value="" disabled selected>請選擇組別</option>
-          <option value="女雙3.0-">女雙 3.0-</option>
-          <option value="女雙3.0+">女雙 3.0+</option>
-          <option value="男雙3.0-">男雙 3.0-</option>
-          <option value="男雙3.0+">男雙 3.0+</option>
-          <option value="男雙3.7+">男雙 3.7+</option>
+        <label>報名組別：</label>
+        <select id="group" required>
+          <option value="男雙3.0+">男雙3.0+</option>
+          <option value="混雙3.0+">混雙3.0+</option>
+          </select>
+      </div>
+      <div class="form-group">
+        <label>代訂便當：</label>
+        <select id="bentoType">
+          <option value="無">不需要</option>
+          <option value="葷食">葷食 (1個)</option>
+          <option value="素食">素食 (1個)</option>
         </select>
-        <span class="error-msg" id="groupError">請選擇報名組別。</span>
       </div>
-
-      <div class="form-group" id="bentoSection">
-        <label>代訂便當 (選填)</label>
-        <div class="radio-group">
-          <label><input type="radio" name="bentoType" value="不訂購" checked> 不訂購</label>
-          <label><input type="radio" name="bentoType" value="葷食"> 葷食</label>
-          <label><input type="radio" name="bentoType" value="素食"> 素食</label>
-        </div>
-        <input type="number" id="bentoQty" placeholder="請輸入便當數量 (若不訂購請留白)" min="0" max="20">
-        <span class="error-msg" id="bentoError"></span>
-      </div>
-
-      <div class="btn-group">
-        <button type="button" class="submit-btn" id="submitBtn">送出報名</button>
-        <button type="button" class="cancel-btn" id="cancelBtn">❌ 取消報名</button>
-      </div>
-
-      <p class="privacy-note">
-        本系統將收集您的姓名、DUPR ID 及 LINE 帳號資訊，<br>
-        僅供本次賽事報名核對用途，不作其他用途。
-      </p>
+      <button type="submit" id="submitBtn">送出報名</button>
     </form>
-
-    <div id="successMessage">
-      ✅ 作業成功！<br>請回到 LINE 查看確認訊息。
-    </div>
   </div>
 
   <script>
-    const MY_LIFF_ID = "2009559432-txA3hu8f";
-    const GAS_URL = "https://script.google.com/macros/s/AKfycby7KXyG-OT1WJbS9YlR3l0iloHXBTSBbnkFnyLu9ukNkqvikPBAF-GHOtAy_7AYIjcpjg/exec";
-    const ENABLE_BENTO = true;
-    //便當開關 True / False
+    // ⚠️ 這裡請換成你自己的資訊！
+    const LIFF_ID = "2009559432-txA3hu8f"; 
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby7KXyG-OT1WJbS9YlR3l0iloHXBTSBbnkFnyLu9ukNkqvikPBAF-GHOtAy_7AYIjcpjg/exec"; 
 
-    const DUPR_REGEX = /^[A-Za-z0-9]{6,10}$/;
-    const NAME_REGEX = /^[\u4e00-\u9fa5A-Za-z\s]+$/;
+    let userProfile = { displayName: "未提供", userId: "未提供" };
 
-    window.onload = function() {
-      if (!ENABLE_BENTO) {
-        document.getElementById('bentoSection').style.display = 'none';
+    // 網頁一載入，馬上執行
+    window.onload = async function() {
+      try {
+        // 步驟 A：檢查系統是否開放報名
+        const response = await fetch(GAS_URL);
+        const data = await response.json();
+        
+        document.getElementById('loadingMessage').style.display = 'none';
+
+        if (data.isOpen) {
+          // 如果開放，顯示表單並初始化 LIFF
+          document.getElementById('formContainer').style.display = 'block';
+          await initLiff();
+        } else {
+          // 如果關閉，顯示未開放訊息
+          document.getElementById('closedMessage').style.display = 'block';
+        }
+      } catch (error) {
+        console.error("狀態檢查失敗", error);
+        document.getElementById('loadingMessage').innerText = "系統連線失敗，請重新整理。";
       }
-      // 分別綁定報名與取消的按鈕事件
-      document.getElementById('submitBtn').addEventListener('click', () => submitRegistration('register'));
-      document.getElementById('cancelBtn').addEventListener('click', () => submitRegistration('cancel'));
-      
-      initializeLiff(MY_LIFF_ID);
     };
 
-    function initializeLiff(myLiffId) {
-      liff.init({ liffId: myLiffId }).then(() => {
-        if (!liff.isLoggedIn()) liff.login();
-      }).catch((err) => {
-        console.error('LIFF 初始化失敗', err);
-        alert("系統初始化失敗，請關閉後重新開啟。");
-      });
-    }
-
-    function setFieldError(inputId, errorId, hasError) {
-      const input = document.getElementById(inputId);
-      const errorEl = document.getElementById(errorId);
-      if (hasError) {
-        input.classList.add('invalid');
-        errorEl.classList.add('show');
+    // 初始化 LIFF 並取得使用者資訊
+    async function initLiff() {
+      await liff.init({ liffId: LIFF_ID });
+      if (liff.isLoggedIn()) {
+        userProfile = await liff.getProfile();
       } else {
-        input.classList.remove('invalid');
-        errorEl.classList.remove('show');
+        liff.login(); // 沒登入的話要求登入
       }
     }
 
-    // 將原本的函數加上 actionType (register 或 cancel)
-    async function submitRegistration(actionType) {
-      const name  = document.getElementById('nameInput').value.trim();
-      const dupr  = document.getElementById('duprInput').value.trim();
-      const group = document.getElementById('groupSelect').value;
+    // 表單送出事件
+    document.getElementById('duprForm').addEventListener('submit', async function(e) {
+      e.preventDefault(); // 阻止預設的表單重整
+      
       const submitBtn = document.getElementById('submitBtn');
-      const cancelBtn = document.getElementById('cancelBtn');
-
-      let hasError = false;
-
-      // 共同驗證：姓名、DUPR、組別是必填的
-      if (!name || !NAME_REGEX.test(name)) { setFieldError('nameInput', 'nameError', true); hasError = true; } 
-      else { setFieldError('nameInput', 'nameError', false); }
-
-      if (!dupr || !DUPR_REGEX.test(dupr)) { setFieldError('duprInput', 'duprError', true); hasError = true; } 
-      else { setFieldError('duprInput', 'duprError', false); }
-
-      if (!group) { setFieldError('groupSelect', 'groupError', true); hasError = true; } 
-      else { setFieldError('groupSelect', 'groupError', false); }
-
-      if (hasError) return;
-
-      // 如果是取消報名，跳出防呆確認視窗
-      if (actionType === 'cancel') {
-        const confirmCancel = confirm(`確定要取消 ${name} 報名的【${group}】嗎？`);
-        if (!confirmCancel) return;
-      }
-
-      // 處理便當邏輯 (只有報名時需要檢查，取消時直接送出即可)
-      let finalBentoType = "無";
-      let finalBentoQty = 0;
-
-      if (ENABLE_BENTO && actionType === 'register') {
-        const selectedType = document.querySelector('input[name="bentoType"]:checked').value;
-        const inputQtyRaw = document.getElementById('bentoQty').value.trim();
-        const inputQty = inputQtyRaw === "" ? 0 : parseInt(inputQtyRaw, 10);
-        const bentoErrorEl = document.getElementById('bentoError');
-
-        if (selectedType !== "不訂購" && inputQty <= 0) {
-          document.getElementById('bentoQty').classList.add('invalid');
-          bentoErrorEl.textContent = "請填寫正確的便當數量！";
-          bentoErrorEl.classList.add('show'); return;
-        }
-        if (selectedType === "不訂購" && inputQty > 0) {
-          document.getElementById('bentoQty').classList.add('invalid');
-          bentoErrorEl.textContent = "請選擇「葷食」還是「素食」！";
-          bentoErrorEl.classList.add('show'); return;
-        }
-
-        document.getElementById('bentoQty').classList.remove('invalid');
-        bentoErrorEl.classList.remove('show');
-
-        if (selectedType !== "不訂購") {
-          finalBentoType = selectedType;
-          finalBentoQty = inputQty;
-        }
-      }
-
-      document.getElementById('loadingOverlay').style.display = 'block';
+      submitBtn.innerText = "報名送出中...";
       submitBtn.disabled = true;
-      cancelBtn.disabled = true;
+
+      // 整理要送給後端的資料
+      const bentoValue = document.getElementById('bentoType').value;
+      const formData = {
+        action: "register",
+        realName: document.getElementById('realName').value,
+        dupr: document.getElementById('duprId').value,
+        group: document.getElementById('group').value,
+        bentoQty: bentoValue === "無" ? 0 : 1,
+        bentoType: bentoValue,
+        lineDisplayName: userProfile.displayName,
+        lineUserId: userProfile.userId
+      };
 
       try {
-        const profile = await liff.getProfile();
-
-        const participantData = {
-          action:          actionType, // 告訴後台這是 register 還是 cancel
-          name:            name,
-          dupr:            dupr,
-          group:           group,
-          bentoType:       finalBentoType,
-          bentoQty:        finalBentoQty,
-          lineUserId:      profile.userId,
-          lineDisplayName: profile.displayName
-        };
-
-        const response = await fetch(GAS_URL, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(participantData)
+        // 發送 POST 請求到你的 GAS 後端
+        const postResponse = await fetch(GAS_URL, {
+          method: 'POST',
+          body: JSON.stringify(formData)
         });
-
-        const result = await response.json();
-        document.getElementById('loadingOverlay').style.display = 'none';
+        const result = await postResponse.json();
 
         if (result.status === "success") {
-          let successAlert = actionType === 'register' ? "報名成功！期待在球場見到您。" : "取消報名成功！";
-          alert(successAlert);
-          
-          if (liff.isInClient()) liff.closeWindow();
-          else {
-            document.getElementById('registrationForm').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'block';
-          }
+          // 報名成功，系統已經透過 GAS 傳 LINE 訊息了，直接關閉視窗即可
+          // (GAS 後端已有 sendLineMessage 邏輯，前端這裡就不再發送，避免重複)
+          alert(`報名成功！您的狀態為：${result.registrationStatus}${result.registrationRank}\n請至 LINE 聊天室查看確認訊息。`);
+          liff.closeWindow(); 
         } else {
-          alert("系統發生錯誤：" + result.message);
+          alert("報名失敗：" + result.message);
+          submitBtn.innerText = "重新送出";
           submitBtn.disabled = false;
-          cancelBtn.disabled = false;
         }
-
       } catch (error) {
-        document.getElementById('loadingOverlay').style.display = 'none';
-        alert("無法連線到伺服器，請稍後再試。");
+        alert("網路錯誤，請稍後再試！");
+        submitBtn.innerText = "重新送出";
         submitBtn.disabled = false;
-        cancelBtn.disabled = false;
       }
-    }
+    });
   </script>
 </body>
 </html>
