@@ -104,7 +104,7 @@
       const bentoValue = document.getElementById('bentoType').value;
       const formData = {
         action: "register",
-        realName: document.getElementById('realName').value,
+        name: document.getElementById('realName').value,      // ✅ 改成 name
         dupr: document.getElementById('duprId').value,
         group: document.getElementById('group').value,
         bentoQty: bentoValue === "無" ? 0 : 1,
