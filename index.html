@@ -121,12 +121,19 @@
         });
         const result = await postResponse.json();
 
-        if (result.status === "success") {
-          // 報名成功，系統已經透過 GAS 傳 LINE 訊息了，直接關閉視窗即可
-          // (GAS 後端已有 sendLineMessage 邏輯，前端這裡就不再發送，避免重複)
+       if (result.status === "success") {
+          // 1. 將按鈕文字改為報名完成
+          submitBtn.innerText = "✅ 報名完成";
+          
+          // 2. 清空表單所有輸入欄位
+          document.getElementById('duprForm').reset();
+
+          // 3. 跳出成功提示
           alert(`報名成功！您的狀態為：${result.registrationStatus}${result.registrationRank}\n請至 LINE 聊天室查看確認訊息。`);
+          
+          // 4. 關閉 LIFF 視窗 (在 LINE App 內會直接退回聊天室)
           liff.closeWindow(); 
-        } else {
+        } else {      
           alert("報名失敗：" + result.message);
           submitBtn.innerText = "重新送出";
           submitBtn.disabled = false;
