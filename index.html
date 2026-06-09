@@ -69,9 +69,10 @@
         document.getElementById('loadingMessage').style.display = 'none';
 
         if (data.isOpen) {
-          // 如果開放，顯示表單並初始化 LIFF
+          // 🔧 修正：先強迫等待 LIFF 初始化與抓取資料完成
+          await initLiff(); 
+          // 確保抓到名字後，才把表單顯示出來讓使用者填寫
           document.getElementById('formContainer').style.display = 'block';
-          await initLiff();
         } else {
           // 如果關閉，顯示未開放訊息
           document.getElementById('closedMessage').style.display = 'block';
